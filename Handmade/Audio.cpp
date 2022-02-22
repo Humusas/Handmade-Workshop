@@ -121,22 +121,8 @@ void Audio::SetRootFolder(const std::string& rootFolder)
 	s_rootFolder = rootFolder;
 }
 //======================================================================================================
-Audio::Audio(Type type, const std::string& tag, const std::string& filename)
+Audio::Audio(Type type, const std::string& tag, const std::string& filename) : m_type(type)
 {
-	m_pan = 0.0f;
-	m_volume = 0.5f;
-	m_frequency = 44100.0f;
-	m_minFrequency = 11025.0f;
-	m_maxFrequency = 176400.0f;
-
-	m_type = type;
-	m_isMuted = false;
-	m_loopCount = Loop::None;
-
-	m_channel = nullptr;
-	m_audioData = nullptr;
-	m_channelGroup = nullptr;
-
 	if (!filename.empty())
 	{
 		Load(type, tag, filename);
@@ -162,8 +148,8 @@ Audio::Audio(const Audio& copy)
 	m_isMuted = copy.m_isMuted;
 	m_loopCount = copy.m_loopCount;
 
-	m_channel = nullptr;
-	m_channelGroup = nullptr;
+//	m_channel = nullptr;
+//	m_channelGroup = nullptr;
 
 	SetAudio(m_tag, m_type);
 }
