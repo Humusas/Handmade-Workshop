@@ -33,12 +33,16 @@ public:
 	void IsTextured(bool flag);
 
 	GLuint GetPriority() const;
-	const std::string& GetTag();
+	const std::string& GetTag() const;
+	const glm::vec4& GetColor() const;
 
 	Transform& GetTransform();
 
 	void SetPriority(GLuint priority);
 	void SetTag(const std::string& tag);
+
+	virtual void SetColor(const glm::vec4& color) {}
+	virtual void SetColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {}
 
 	virtual void Render(Shader& shader) = 0;
 	virtual void Update(GLfloat deltaTime) = 0;
