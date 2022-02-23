@@ -91,16 +91,20 @@ public:
 
 private:
 
+	float m_pan{ 0.0f };
+	float m_volume{ 0.5f };
+	float m_frequency{ 44100.0f };
+	float m_minFrequency{ 11025.0f };
+	float m_maxFrequency{ 176400.0f };
+
 	Type m_type;
-	bool m_isMuted;
-	Loop m_loopCount;
+	bool m_isMuted{ false };
+	Loop m_loopCount{ Loop::None };
 	std::string m_tag;
 
-	float m_pan = 0.0f;
-	float m_volume = 0.5f;
-	float m_frequency = 44100.0f;
-	float m_minFrequency = 11025.0f;
-	float m_maxFrequency = 176400.0f;
+	FMOD::Sound* m_audioData;
+	FMOD::Channel* m_channel;
+	FMOD::ChannelGroup* m_channelGroup;
 
 	FMOD::Sound* m_audioData = nullptr;
 	FMOD::Channel* m_channel = nullptr;
@@ -110,5 +114,4 @@ private:
 	static FMOD::System* s_audioSystem;
 	static std::map<std::string, FMOD::Sound*> s_music;
 	static std::map<std::string, FMOD::Sound*> s_sounds;
-
 };
