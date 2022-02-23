@@ -106,9 +106,9 @@ private:
 	FMOD::Channel* m_channel;
 	FMOD::ChannelGroup* m_channelGroup;
 
-	FMOD::Sound* m_audioData = nullptr;
-	FMOD::Channel* m_channel = nullptr;
-	FMOD::ChannelGroup* m_channelGroup = nullptr;
+//	FMOD::Sound* m_audioData = nullptr;
+//	FMOD::Channel* m_channel ;
+//	FMOD::ChannelGroup* m_channelGroup ;
 
 	static std::string s_rootFolder;
 	static FMOD::System* s_audioSystem;

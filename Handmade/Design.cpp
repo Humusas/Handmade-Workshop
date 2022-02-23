@@ -182,7 +182,7 @@ bool Design::OnEnter()
 	m_text.back().SetColor(1.0f, 0.75f, 0.1f);
 	m_text.back().SetString("Text #3");*/
 
-	/*Audio::Load(Audio::Type::Music, "Test1", "Armin.wav");
+	Audio::Load(Audio::Type::Music, "Test1", "Armin.wav");
 	Audio::Load(Audio::Type::Music, "Test2", "Dance.mp3");
 	Audio::Load(Audio::Type::Music, "Test3", "Journeys.ogg");
 
@@ -190,7 +190,7 @@ bool Design::OnEnter()
 	m_audio2 = std::make_unique<Audio>(Audio::Type::Music, "Test2");
 	m_audio3 = std::make_unique<Audio>(Audio::Type::Music, "Test2");
 
-	m_audio2->Play();*/
+	m_audio2->Play();
 
 	//==========================================================================
 
