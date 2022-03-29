@@ -1,11 +1,4 @@
 #pragma once
-
-/*===================================================================#
-| 'Model' source files last updated on 23 February 2022              |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include <map>
 #include <vector>
 #include "Buffer.h"
@@ -68,8 +61,7 @@ public:
 	static void Unload(const std::string& tag = "");
 	static void SetRootFolder(const std::string& rootFolder);
 
-	Model(Object* parent = nullptr,
-		const std::string& tag = "",
+	Model(const std::string& tag = "",
 		const std::string& filename = "",
 		bool isNormalized = false,
 		const std::string& defaultMaterial = "Chrome");

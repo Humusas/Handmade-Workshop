@@ -1,10 +1,12 @@
 #include "Circle.h"
 
 //======================================================================================================
-Circle::Circle(Object* parent, 
+Circle::Circle(const std::string& tag,
 	GLfloat radius, GLuint slices, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-	: Object(parent), m_slices(slices), m_radius(radius), m_buffer("Circle", slices + 1)
+	: Object(tag), m_slices(slices), m_radius(radius), m_buffer(tag, slices + 1)
 {
+	m_color = glm::vec4(r, g, b, a);
+
 	auto offsetVertex = 0U;
 	auto offsetColor = 0U;
 
@@ -60,7 +62,7 @@ Circle::Circle(Object* parent,
 //======================================================================================================
 Circle::~Circle()
 {
-	m_buffer.Destroy("Circle");
+	m_buffer.Destroy(m_tag);
 }
 //======================================================================================================
 void Circle::SetRadius(GLfloat radius)
@@ -96,6 +98,7 @@ void Circle::SetColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
 		m_buffer.AppendVBO(Buffer::VBO::ColorBuffer, colors, sizeof(colors), offset);
 		offset += sizeof(colors);
 	}
+
 	m_color = glm::vec4(r, g, b, a);
 }
 //======================================================================================================
@@ -106,6 +109,18 @@ void Circle::Render(Shader& shader)
 		Buffer::VBO::VertexBuffer, Buffer::ComponentSize::XYZ, Buffer::DataType::FloatData);
 	m_buffer.LinkVBO(shader.GetAttributeID("colorIn"),
 		Buffer::VBO::ColorBuffer, Buffer::ComponentSize::RGBA, Buffer::DataType::FloatData);
+
+	//Quick fix to allow child objects without parent objects (this avoids a crash)
+	//TODO - What we require here is a proper parent/child linkage of objects
+	if (m_parent)
+	{
+		shader.SendData("model", m_parent->GetTransform().GetMatrix() * m_transform.GetMatrix());
+	}
+
+	else
+	{
+		shader.SendData("model", m_transform.GetMatrix());
+	}
 
 	m_buffer.Render(Buffer::RenderMode::TriangleFan);
 }

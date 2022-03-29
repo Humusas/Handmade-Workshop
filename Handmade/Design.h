@@ -1,15 +1,11 @@
 #pragma once
-
-/*===================================================================#
-| 'Design' source files last updated on 23 February 2022             |
-#===================================================================*/
-
 #include <deque>
 #include <memory>
 #include <vector>
 #include <glm.hpp>
 #include "Audio.h"
 #include "Axes.h"
+#include "Circle.h"
 #include "Cuboid.h"
 #include "FreeCamera.h"
 #include "Grid.h"
@@ -22,8 +18,9 @@
 #include "State.h"
 #include "Text.h"
 
-const auto MINOR = 0.2f;
-const auto MAJOR = 0.8f;
+const auto MINOR = 0.15f;
+const auto MAJOR = 0.85f;
+const auto FONT_SIZE = 18.0f;
 const auto UI_PADDING = 2.0f;
 const auto MAX_CONSOLE_LOG_SIZE = 1000;
 
@@ -43,6 +40,7 @@ public:
 private:
 
 	void RenderConsoleWindow();
+	void RenderHierarchyWindow();
 	void RenderPropertiesWindow();
 
 	GLint m_minorWidth{ 0 };
@@ -73,13 +71,10 @@ private:
 	std::unique_ptr<Audio> m_audio3;*/
 
 	std::unique_ptr<Light> m_light;
-	std::unique_ptr<Model> m_model;
-
+	
 	//Generic object (for testing)
-	std::unique_ptr<Object> m_object;
-
-	//std::unique_ptr<Cuboid> m_cube;
-	//std::unique_ptr<Sphere> m_sphere;
+	Object* m_activeObject;
+	std::vector<std::unique_ptr<Object>> m_objects;
 
 	//std::unique_ptr<Tile> m_labelX;
 	//std::unique_ptr<Tile> m_labelY;
@@ -93,6 +88,5 @@ private:
 	//==================================================================
 
 	std::deque<std::string> m_consoleLog;
-	std::vector<std::unique_ptr<Object>> m_objects;
 
 };

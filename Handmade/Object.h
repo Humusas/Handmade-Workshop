@@ -1,14 +1,8 @@
 #pragma once
-
-/*===================================================================#
-| 'Object' source files last updated on 23 February 2022             |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include "GLAD/gl.h"
 #include <glm.hpp>
 #include <string>
+#include <vector>
 #include "Shader.h"
 #include "Transform.h"
 
@@ -17,7 +11,7 @@ class Object
 
 public:
 
-	Object(Object* parent);
+	Object(const std::string& tag);
 	virtual ~Object() = 0 {}
 
 	bool IsLit() const;
@@ -41,6 +35,8 @@ public:
 	void SetPriority(GLuint priority);
 	void SetTag(const std::string& tag);
 
+	void AddChild(Object* child);
+
 	virtual void SetColor(const glm::vec4& color) {}
 	virtual void SetColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a) {}
 
@@ -50,6 +46,8 @@ public:
 
 protected:
 
+	glm::mat4 GetFinalMatrix();
+	
 	bool m_isLit{ false };
 	bool m_isAlive{ true };
 	bool m_isActive{ true };
@@ -60,8 +58,10 @@ protected:
 	glm::vec4 m_color{ 1.0f };
 	glm::mat3 m_normalMatrix{ 1.0f };
 
-	Object* m_parent;
 	std::string m_tag;
 	Transform m_transform;
+
+	Object* m_parent{ nullptr };
+	std::vector<Object*> m_children;
 
 };

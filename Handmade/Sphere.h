@@ -1,11 +1,4 @@
 #pragma once
-
-/*===================================================================#
-| 'Sphere' source files last updated on 23 February 2022             |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include "GLAD/gl.h"
 #include <glm.hpp>
 #include "Buffer.h"
@@ -16,8 +9,8 @@ class Sphere : public Object
 
 public:
 
-	Sphere(Object* parent, GLfloat radius = 1.0f, GLuint segments = 25, GLuint slices = 25,
-		GLfloat r = 1.0f, GLfloat g = 1.0f, GLfloat b = 1.0f, GLfloat a = 1.0f);
+	Sphere(const std::string& tag, GLfloat radius = 1.0f, GLuint segments = 25, GLuint slices = 25,
+		GLfloat r = 0.5f, GLfloat g = 0.5f, GLfloat b = 0.5f, GLfloat a = 1.0f);
 	virtual ~Sphere();
 
 	void SetRadius(GLfloat radius);
@@ -31,11 +24,9 @@ public:
 
 private:
 
+	Buffer m_buffer;
 	GLuint m_slices;
 	GLfloat m_radius;
 	GLuint m_segments;
-
-	Buffer m_buffer;
-	glm::vec4 m_color;
 
 };

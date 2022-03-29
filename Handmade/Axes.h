@@ -1,11 +1,4 @@
 #pragma once
-
-/*===================================================================#
-| 'Axes' source files last updated on 23 February 2022               |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include "Buffer.h"
 #include "Model.h"
 #include "Object.h"
@@ -17,8 +10,8 @@ class Axes : public Object
 
 public:
 
-	Axes(const std::string& filenameModel);
-	Axes(GLint size = 15, GLfloat lineWidth = 5.0f);
+	Axes(const std::string& tag, const std::string& filenameModel);
+	Axes(const std::string& tag, GLint size = 15, GLfloat lineWidth = 5.0f);
 	virtual ~Axes();
 
 	void SetSize(GLint size);

@@ -1,11 +1,4 @@
 #pragma once
-
-/*===================================================================#
-| 'Tile' source files last updated on 23 February 2022               |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include <string>
 #include "GLAD/gl.h"
 #include <glm.hpp>
@@ -18,7 +11,7 @@ class Tile : public Object
 
 public:
 
-	Tile(Object* parent, const std::string& filename,
+	Tile(const std::string& tag, const std::string& filename,
 		GLfloat width = 1.0f, GLfloat height = 1.0f,
 		GLuint spriteSheetCol = 1, GLuint spriteSheetRow = 1);
 	virtual ~Tile();

@@ -2,10 +2,11 @@
 #include "Input.h"
 
 //======================================================================================================
-Cuboid::Cuboid(Object* parent, GLfloat width, GLfloat height, GLfloat depth,
+Cuboid::Cuboid(const std::string& tag, GLfloat width, GLfloat height, GLfloat depth,
 	GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-	: Object(parent), m_buffer("Cuboid", 36, true)
+	: Object(tag), m_buffer(tag, 36, true)
 {
+	m_color = glm::vec4(r, g, b, a);
 	m_dimension = glm::vec3(width, height, depth);
 
 	glm::vec3 halfDimension = m_dimension * 0.5f;
@@ -118,7 +119,7 @@ Cuboid::Cuboid(Object* parent, GLfloat width, GLfloat height, GLfloat depth,
 //======================================================================================================
 Cuboid::~Cuboid()
 {
-	m_buffer.Destroy("Cuboid");
+	m_buffer.Destroy(m_tag);
 }
 //======================================================================================================
 void Cuboid::SetTextureScale(GLfloat width, GLfloat height)
@@ -222,18 +223,7 @@ void Cuboid::Render(Shader& shader)
 
 	//shader.SendData("normal", m_normalMatrix);
 
-	//Quick fix to allow child objects without parent objects (this avoids a crash)
-	//TODO - What we require here is a proper parent/child linkage of objects
-	if (m_parent)
-	{
-		shader.SendData("model", m_parent->GetTransform().GetMatrix() * m_transform.GetMatrix());
-	}
-
-	else
-	{
-		shader.SendData("model", m_transform.GetMatrix());
-	}
-
+	shader.SendData("model", GetFinalMatrix());
 	shader.SendData("isTextured", static_cast<GLuint>(m_isTextured));
 
 	m_buffer.Render(Buffer::RenderMode::Triangles);

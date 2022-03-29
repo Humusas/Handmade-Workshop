@@ -1,11 +1,4 @@
 #pragma once
-
-/*===================================================================#
-| 'Text' source files last updated on 22 February 2022                |
-#====================================================================#
-| Class has gone through initial tests. No known issues found.       |
-#===================================================================*/
-
 #include <map>
 #include <ft2build.h>
 #include <freetype\freetype.h>
@@ -28,7 +21,7 @@ public:
 
 	static void SetRootFolder(const std::string& rootFolder);
 
-	Text(Object* parent, const std::string& tag = "",
+	Text(const std::string& tag, 
 		const std::string& filename = "", GLuint fontSize = 10U);
 	Text(const Text& copy);
 	virtual ~Text();

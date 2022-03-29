@@ -1,16 +1,10 @@
 #pragma once
-
-/*===================================================================#
-| 'Line' source files last updated on 23 February 2022               |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include "GLAD/gl.h"
 #include <glm.hpp>
 #include "Buffer.h"
 #include "Object.h"
 
+//TODO - Consider not deriving this from Object
 //TODO - Add line start/end position to ctor so that we have an actual line to begin with
 //TODO - Add SetStart/end position functions to set the absolute values of the line segment
 
@@ -19,7 +13,7 @@ class Line : public Object
 
 public:
 
-	Line(Object* parent, 
+	Line(const std::string& tag,
 		GLfloat lineWidth = 2.0f, 
 		GLfloat r = 1.0f, GLfloat g = 1.0f, GLfloat b = 1.0f, GLfloat a = 1.0f);
 	virtual ~Line();

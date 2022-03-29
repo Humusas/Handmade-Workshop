@@ -129,15 +129,29 @@ bool Design::OnEnter()
 
 	m_consoleLog.push_front("Audio sub-system initialized.");
 
-	//===================================================================
-
-	m_grid = std::make_unique<Grid>();
-	m_grid->GetTransform().SetRotation(45.0f, -30.0f, 0.0f);
-	m_consoleLog.push_front("Grid created.");
-
 	//=========================================================================
 
-	m_sceneCamera = std::make_unique<FreeCamera>();
+	ImGui::GetIO().Fonts->AddFontFromFileTTF("Assets/Fonts/Quikhand.ttf", FONT_SIZE);
+	ImGui::GetIO().Fonts->Build();
+
+	//WIP======================================================================
+	//Adding objects to the scene
+	//========================================================================= 
+
+	m_grid = std::make_unique<Grid>("World_grid");
+	m_grid->GetTransform().SetRotation(45.0f, -30.0f, 0.0f);
+
+	//m_object = std::make_unique<Cuboid>(m_grid.get());
+	m_objects.emplace_back(std::make_unique<Cuboid>("Cube_1"));
+	m_grid->AddChild(m_objects.back().get());
+
+	auto back = m_objects.back().get();
+	m_objects.emplace_back(std::make_unique<Cuboid>("Cube_2"));
+	back->AddChild(m_objects.back().get());
+
+	m_activeObject = m_objects.back().get();
+
+	m_sceneCamera = std::make_unique<FreeCamera>("Main_cam");
 	m_sceneCamera->SetVelocity(0.0f);
 	m_sceneCamera->SetSensitivity(0.0f);
 	m_sceneCamera->GetTransform().SetPosition(0.0f, 0.0f, 50.0f);
@@ -145,17 +159,6 @@ bool Design::OnEnter()
 	m_consoleLog.push_front("Scene camera created.");
 
 	//=========================================================================
-
-	ImGui::GetIO().Fonts->AddFontFromFileTTF("Assets/Fonts/Arial.ttf", 16.0f);
-	ImGui::GetIO().Fonts->Build();
-
-	//=========================================================================
-
-	//WIP======================================================================
-
-	//m_axes = std::make_unique<Axes>("Arrow.obj");
-
-	m_object = std::make_unique<Cuboid>(m_grid.get());
 
 	/*m_topText = std::make_unique<Text>("Quikhand", "Quikhand.ttf", 30);
 	m_topText->SetColor(1.0f, 0.0f, 0.196f, 1.0f);
@@ -200,7 +203,6 @@ bool Design::OnEnter()
 	//m_model->GetTransform().SetScale(5.0f, 5.0f, 5.0f);
 	//m_model->SetColor(1, 0, 1, 1);
 
-	//m_cube = std::make_unique<Cuboid>();
 	//m_sphere = std::make_unique<Sphere>(10.0f, 50.0f, 50.0f);
 
 	return true;
@@ -217,17 +219,10 @@ State* Design::Update(int deltaTime)
 
 	//==============================================================================
 
-	auto camPos = m_sceneCamera->GetTransform().GetPosition();
-	camPos.z -= (Input::Instance()->GetMouseWheel().y);
-	m_sceneCamera->GetTransform().SetPosition(camPos);
-
-	auto mouseMotion = Input::Instance()->GetMouseMotion();
-
-	//Screen/Mouse collider code - notr yet working properly==========================
 	BoxCollider sceneBox;
 	auto dimension = m_sceneCamera->GetResolution();
 
-	sceneBox.SetPosition(dimension.x * 0.5f, dimension.y * 0.5f, 0.0f);
+	sceneBox.SetPosition(m_minorWidth + (dimension.x * 0.5f), dimension.y * 0.5f, 0.0f);
 	sceneBox.SetDimension(static_cast<GLfloat>(dimension.x), static_cast<GLfloat>(dimension.y), 0.0f);
 	sceneBox.Update();
 
@@ -239,14 +234,23 @@ State* Design::Update(int deltaTime)
 
 	//================================================================================
 
-	if (Input::Instance()->IsLeftButtonClicked() && sceneBox.IsColliding(mouseBox))
+	if (sceneBox.IsColliding(mouseBox))
 	{
-		m_sceneRotation.x += -mouseMotion.y;
-		m_sceneRotation.y += mouseMotion.x;
+		//Zoom
+		auto camPos = m_sceneCamera->GetTransform().GetPosition();
+		camPos.z -= (Input::Instance()->GetMouseWheel().y);
+		m_sceneCamera->GetTransform().SetPosition(camPos);
+
+		//Rotate grid
+		if (Input::Instance()->IsLeftButtonClicked())
+		{
+			auto mouseMotion = Input::Instance()->GetMouseMotion();
+			m_sceneRotation.x += -mouseMotion.y;
+			m_sceneRotation.y += mouseMotion.x;
+			m_grid->GetTransform().SetRotation(m_sceneRotation);
+		}
 	}
 
-	m_grid->GetTransform().SetRotation(m_sceneRotation);
-	
 	//==============================================================================
 
 	for (const auto& object : m_objects)
@@ -282,16 +286,20 @@ bool Design::Render()
 		Screen::Instance()->Refresh();
 	};
 
+	//Hierarchy viewport
+	SetViewport(glm::ivec4(0, m_minorHeight, m_minorWidth, m_resolution.y - m_minorHeight),
+		glm::uvec4(0U, 144U, 255U, 1U));
+
 	//Console viewport
 	SetViewport(glm::ivec4(0, 0, m_majorWidth, m_minorHeight),
-		glm::uvec4(255U, 200U, 0U, 1U));
+		glm::uvec4(0U, 144U, 255U, 1U));
 
 	//Properties viewport
 	SetViewport(glm::ivec4(m_majorWidth, 0, m_minorWidth, m_resolution.y),
 		glm::uvec4(0U, 144U, 255U, 1U));
 
 	//Scene viewport
-	m_sceneCamera->SetViewport(0, m_minorHeight, m_majorWidth, m_majorHeight);
+	m_sceneCamera->SetViewport(m_minorWidth, m_minorHeight, m_resolution.x - (m_minorWidth * 2), m_majorHeight);
 	m_sceneCamera->CreatePerspView();
 
 	mainShader.Use();
@@ -302,7 +310,11 @@ bool Design::Render()
 	//==============================================================================
 
 	m_grid->Render(mainShader);
-	m_object->Render(mainShader);
+
+	for (const auto& object : m_objects)
+	{
+		object->Render(mainShader);
+	}
 
 	/*lightShader.Use();
 	lightShader.SendData("cameraPosition", m_sceneCamera->GetTransform().GetPosition());
@@ -399,6 +411,7 @@ bool Design::Render()
 	ImGui::NewFrame();
 
 	RenderConsoleWindow();
+	RenderHierarchyWindow();
 	RenderPropertiesWindow();
 
 	ImGui::Render();
@@ -423,7 +436,7 @@ void Design::RenderConsoleWindow()
 
 	auto windowPos = ImVec2(UI_PADDING,
 		static_cast<float>(m_majorHeight + UI_PADDING + 1.0f));
-	auto windowSize = ImVec2(static_cast<float>(m_majorWidth - UI_PADDING * 2.0f),
+	auto windowSize = ImVec2(static_cast<float>(m_majorWidth - UI_PADDING),
 		static_cast<float>(m_minorHeight - UI_PADDING * 2.0f));
 
 	ImGui::SetWindowPos("Output console", windowPos);
@@ -437,6 +450,40 @@ void Design::RenderConsoleWindow()
 	for (auto& log : m_consoleLog)
 	{
 		ImGui::Text(log.c_str());
+	}
+
+	ImGui::End();
+}
+//======================================================================================================
+void Design::RenderHierarchyWindow()
+{
+	ImGui::Begin("Hierarchy", nullptr,
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoCollapse);
+
+	auto windowPos = ImVec2(static_cast<float>(UI_PADDING), UI_PADDING);
+	auto windowSize = ImVec2(static_cast<float>(m_minorWidth - UI_PADDING * 2.0f),
+		static_cast<float>(m_resolution.y - m_minorHeight - UI_PADDING));
+
+	ImGui::SetWindowPos("Hierarchy", windowPos);
+	ImGui::SetWindowSize("Hierarchy", windowSize);
+
+	//For extra help:
+	//https://github.com/ocornut/imgui/issues/324
+
+	if (ImGui::TreeNode("Scene"))
+	{
+		for (const auto& object : m_objects)
+		{
+			if (ImGui::TreeNode(object->GetTag().c_str()))
+			{
+				m_activeObject = object.get();
+				ImGui::TreePop();
+			}
+		}
+
+		ImGui::TreePop();
 	}
 
 	ImGui::End();
@@ -458,19 +505,44 @@ void Design::RenderPropertiesWindow()
 
 	ImGui::TextColored({ 0.0f, 0.56f, 0.8f, 1.0f }, "Transform");
 	ImGui::Separator();
-	
-	auto position = m_object->GetTransform().GetPosition();
+
+	static auto isGlobal = false;
+	ImGui::Checkbox("Global", &isGlobal);
+
+	static auto isUniformScale = false;
+	ImGui::Checkbox("Uniform scale", &isUniformScale);
+
+	ImGui::Spacing();
+
+	auto position = m_activeObject->GetTransform().GetPosition();
 	ImGui::SliderFloat3("Position", &position.x, -25.0f, 25.0f, "%.2f");
-	m_object->GetTransform().SetPosition(position);
-	
+	m_activeObject->GetTransform().SetPosition(position);
+
 	//TODO - There is a tiny bug here with the sliders
-	auto rotation = m_object->GetTransform().GetEulerAngles();
+	auto rotation = m_activeObject->GetTransform().GetEulerAngles();
 	ImGui::SliderFloat3("Rotation", &rotation.x, -360.0f, 360.0f, "%.2f");
-	m_object->GetTransform().SetRotation(rotation);
-	
-	auto scale = m_object->GetTransform().GetScale();
-	ImGui::SliderFloat3("Scale", &scale.x, 1.0f, 30.0f, "%.2f");
-	m_object->GetTransform().SetScale(scale);
+	m_activeObject->GetTransform().SetRotation(rotation);
+
+	auto scale = m_activeObject->GetTransform().GetScale();
+
+	if (isUniformScale)
+	{
+		ImGui::SliderFloat("Scale", &scale.x, 0.01f, 30.0f, "%.2f");
+		m_activeObject->GetTransform().SetScale(glm::vec3(scale.x));
+	}
+
+	else
+	{
+		ImGui::SliderFloat3("Scale", &scale.x, 0.01f, 30.0f, "%.2f");
+		m_activeObject->GetTransform().SetScale(scale);
+	}
+
+	ImGui::Spacing();
+
+	if (ImGui::Button("Reset", ImVec2(80, 25)))
+	{
+		m_activeObject->GetTransform().SetIdentity();
+	}
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -480,9 +552,9 @@ void Design::RenderPropertiesWindow()
 	ImGui::TextColored({ 0.0f, 0.56f, 0.8f, 1.0f }, "Material");
 	ImGui::Separator();
 
-	auto color = m_object->GetColor();
+	auto color = m_activeObject->GetColor();
 	ImGui::ColorEdit4("Color", &color.r);
-	m_object->SetColor(color);
+	m_activeObject->SetColor(color);
 
 	ImGui::End();
 }

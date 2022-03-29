@@ -2,10 +2,10 @@
 #include "Sphere.h"
 
 //======================================================================================================
-Sphere::Sphere(Object* parent, GLfloat radius, GLuint segments, GLuint slices,
+Sphere::Sphere(const std::string& tag, GLfloat radius, GLuint segments, GLuint slices,
 	GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-	: Object(parent), m_slices(slices), m_radius(radius), m_segments(segments),
-	m_buffer("Sphere", segments* (slices - 1) * 6, true)
+	: Object(tag), m_slices(slices), m_radius(radius), m_segments(segments),
+	m_buffer(tag, segments* (slices - 1) * 6, true)
 {
 	m_color = glm::vec4(r, g, b, a);
 
@@ -77,7 +77,7 @@ Sphere::Sphere(Object* parent, GLfloat radius, GLuint segments, GLuint slices,
 //======================================================================================================
 Sphere::~Sphere()
 {
-	m_buffer.Destroy("Sphere");
+	m_buffer.Destroy(m_tag);
 }
 //======================================================================================================
 void Sphere::SetRadius(GLfloat radius)
@@ -129,7 +129,18 @@ void Sphere::Render(Shader& shader)
 	m_buffer.LinkVBO(shader.GetAttributeID("colorIn"),
 		Buffer::VBO::ColorBuffer, Buffer::ComponentSize::RGBA, Buffer::DataType::FloatData);
 
-	shader.SendData("model", m_transform.GetMatrix());
+	//Quick fix to allow child objects without parent objects (this avoids a crash)
+	//TODO - What we require here is a proper parent/child linkage of objects
+	if (m_parent)
+	{
+		shader.SendData("model", m_parent->GetTransform().GetMatrix() * m_transform.GetMatrix());
+	}
+
+	else
+	{
+		shader.SendData("model", m_transform.GetMatrix());
+	}
+
 	shader.SendData("isTextured", static_cast<GLuint>(m_isTextured));
 
 	m_buffer.Render(Buffer::RenderMode::Triangles);

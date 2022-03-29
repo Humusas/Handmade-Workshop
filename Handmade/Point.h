@@ -1,16 +1,10 @@
 #pragma once
-
-/*===================================================================#
-| 'Point' source files last updated on 23 February 2022              |
-#====================================================================#
-| Class has not been fully tested. No known issues found.            |
-#===================================================================*/
-
 #include "GLAD/gl.h"
 #include <glm.hpp>
 #include "Buffer.h"
 #include "Object.h"
 
+//TODO - Consider not deriving this from Object
 //TODO - Add position value to the ctor (use David's MFC app as a reference)
 
 class Point : public Object
@@ -18,7 +12,7 @@ class Point : public Object
 
 public:
 
-	Point(Object* parent, 
+	Point(const std::string& tag,
 		GLfloat pointSize = 5.0f,
 		GLfloat r = 1.0f, GLfloat g = 1.0f, GLfloat b = 1.0f, GLfloat a = 1.0f);
 	virtual ~Point();

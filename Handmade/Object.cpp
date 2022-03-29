@@ -1,8 +1,10 @@
+#include <assert.h>
+#include <deque>
 #include "Object.h"
 #include "Shader.h"
 
 //======================================================================================================
-Object::Object(Object* parent) : m_parent(parent) {}
+Object::Object(const std::string& tag) : m_tag(tag) {}
 //======================================================================================================
 bool Object::IsLit() const
 {
@@ -82,4 +84,34 @@ void Object::SetPriority(GLuint priority)
 void Object::SetTag(const std::string& tag)
 {
 	m_tag = tag;
+}
+//======================================================================================================
+void Object::AddChild(Object* child)
+{
+	assert(child->m_parent == nullptr);
+	m_children.emplace_back(child);
+	m_children.back()->m_parent = this;
+}
+//======================================================================================================
+glm::mat4 Object::GetFinalMatrix()
+{
+	std::deque<glm::mat4> matrices;
+	matrices.emplace_front(m_transform.GetMatrix());
+
+	auto parent = m_parent;
+
+	while (parent)
+	{
+		matrices.emplace_front(parent->GetTransform().GetMatrix());
+		parent = parent->m_parent;
+	}
+
+	auto finalMatrix = glm::mat4(1.0f);
+
+	for (auto& matrix : matrices)
+	{
+		finalMatrix *= matrix;
+	}
+
+	return finalMatrix;
 }
